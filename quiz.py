@@ -45,7 +45,7 @@ class GFGQuizAutomator:
             # Action Selectors
             'action_button': (By.XPATH, "//button[normalize-space()='Submit Response' or normalize-space()='Submitted']"),
             
-            # --- THE FIX: Attacking the custom GFG div instead of standard radio buttons ---
+            # Attacking the custom GFG div instead of standard radio buttons
             'first_option_label': (By.XPATH, "(//div[contains(@class, 'QuizRadioBtn_radio_container')])[1]"),
             
             'next_btn': (By.XPATH, "//button[contains(., 'Next')]"),
@@ -118,9 +118,10 @@ class GFGQuizAutomator:
         total_acc = len(accordions_raw)
         accordions_to_process = min(7, total_acc) 
         
-        logging.info(f"Quiz Bot Locked. Processing first {accordions_to_process} sections.")
+        logging.info(f"Quiz Bot Locked. Processing {accordions_to_process} sections in DESCENDING order.")
         
-        for acc_idx in range(accordions_to_process):
+        # --- THE FIX: Iterating backwards from Bottom (Section 7) to Top (Section 1) ---
+        for acc_idx in range(accordions_to_process - 1, -1, -1):
             logging.info(f"--- Focusing strictly on Section {acc_idx + 1} of {accordions_to_process} ---")
             self.exhaust_accordion(acc_idx)
             
@@ -247,6 +248,11 @@ class GFGQuizAutomator:
         question_number = 1
 
         while True:
+            # --- THE FIX: 20 Question Killswitch ---
+            if question_number > 20:
+                logging.warning(f"Reached {question_number} questions. Triggering 20-question killswitch and escaping.")
+                break
+
             logging.info(f"Checking Question #{question_number} state...")
             time.sleep(2) 
             
